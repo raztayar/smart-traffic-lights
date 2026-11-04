@@ -1,0 +1,46 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Secrets / local config ---
+.env
+.env.*
+.streamlit/secrets.toml
+
+# --- Data & datasets (download with scripts, never commit) ---
+data/
+datasets/
+
+# --- Training outputs ---
+runs/          # TensorBoard logs
+wandb/         # Weights & Biases logs
+checkpoints/
+models/
+*.pt
+*.pth
+*.onnx
+
+# --- Simulation & evaluation outputs ---
+# (keep SUMO input files like *.net.xml in sim/; ignore generated outputs)
+outputs/
+results/raw/
+
+# --- Media (demo video will be hosted elsewhere or added explicitly) ---
+*.mp4
+*.avi
+*.mov
+
+# --- OS / editor ---
+.DS_Store
+.idea/
