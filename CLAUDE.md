@@ -52,16 +52,16 @@ _To be filled in as they exist._
 - Train: `TBD`
 
 ## Roadmap
-- **M0**: CLAUDE.md, README, repo setup ← _current_
-- **M1**: SUMO junction, baseline controllers, safety guard and its tests, benchmark script
+- **M0**: CLAUDE.md, README, repo setup ✅
+- **M1**: SUMO junction, baseline controllers, safety guard and its tests, benchmark script ← _current_
 - **M2**: RL controller (DQN → PPO), reward ablations, held-out evaluation (centerpiece)
 - **M3**: perception (YOLO + ByteTrack → lane counts), counting-error evaluation, fisheye handling
 - **M4**: integration, side-by-side demo video, Docker, polished README
 - Optional: multi-junction grid, pedestrians/emergency vehicles, ONNX + latency benchmark
 
 ## Current status
-- 2026-11-04: Project scoped. CLAUDE.md and README written. No code yet. GitHub repo not yet connected.
-- **Next step:** connect the GitHub repo, then start M1 (install SUMO, build the single 4-way junction network).
+- 2026-11-04: M0 done. CLAUDE.md, README, MIT LICENSE and .gitignore are committed and pushed to https://github.com/raztayar/smart-traffic-lights (public, with topics set). No code yet.
+- **Next step:** start M1 by installing SUMO (macOS, Homebrew available), setting up the Python environment, and building the single 4-way junction network.
 
 ## Decisions log
 - 2026-11-04: Target ML/AI-engineer roles, so the RL controller and benchmark are the centerpiece and vision stays pragmatic.
