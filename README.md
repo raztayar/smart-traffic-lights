@@ -25,13 +25,13 @@ Most traffic lights run on fixed timers or simple sensor rules. They give green 
 flowchart LR
     CAM[Junction camera<br/>incl. 360 / fisheye] --> PER[Perception<br/>YOLO + ByteTrack<br/>→ lane mapping]
     SIM[SUMO simulator] --> STATE
-    PER --> STATE[JunctionState<br/>per-lane queues,<br/>approaching cars,<br/>waiting time]
+    PER --> STATE[JunctionState<br/>every visible car:<br/>lane, position,<br/>speed, waiting time]
     STATE --> CTRL[Controller<br/>fixed-time · actuated ·<br/>max-pressure · RL]
-    CTRL --> SAFE[Safety guard<br/>min green · yellow ·<br/>all-red · conflicts]
+    CTRL --> SAFE[Safety guard<br/>min green · yellow ·<br/>intergreen · conflicts]
     SAFE --> PHASE[Signal phase]
 ```
 
-- **Perception** turns camera footage into a compact, lane-level `JunctionState`.
+- **Perception** turns camera footage into a `JunctionState`: every visible car's lane, position, speed and waiting time. The simulator produces exactly the same structure, built by the same code.
 - **Controllers** only see `JunctionState`, never pixels. The same controller therefore runs on simulated traffic (for training and evaluation) and on real footage (for the demo).
 - **The safety guard** sits outside every controller, including the learned one. The RL agent can only choose among safe transitions.
 
@@ -57,7 +57,7 @@ _Coming in M2. All numbers are on held-out traffic scenarios over 10+ seeds, wit
 _Coming soon._ Planned: a single Docker command that runs the benchmark and reproduces the results table.
 
 ## Tech stack
-Python · SUMO / TraCI · Gymnasium (`sumo-rl`) · Stable-Baselines3 · PyTorch · Ultralytics YOLO · ByteTrack · OpenCV · pytest · Docker · GitHub Actions · Streamlit
+Python · SUMO / TraCI · Gymnasium · Stable-Baselines3 · PyTorch · Ultralytics YOLO · ByteTrack · OpenCV · pytest · Docker · GitHub Actions · Streamlit
 
 ## Roadmap
 - [x] **M0**: Project scope, architecture, repo setup
@@ -76,3 +76,4 @@ Python · SUMO / TraCI · Gymnasium (`sumo-rl`) · Stable-Baselines3 · PyTorch 
 - [sumo-rl](https://github.com/LucasAlegre/sumo-rl): RL environments for traffic-signal control
 - UA-DETRAC, AI City Challenge, FishEye8K: vehicle detection and tracking datasets
 - Varaiya, _Max pressure control of a network of signalized intersections_ (2013)
+- Israel Ministry of Transport, [_Traffic Signal Planning Guidelines_ (הנחיות לתכנון רמזורים), 2025](https://www.gov.il/BlobFolder/guide/planning_traffic_lights/he/%D7%94%D7%A0%D7%97%D7%99%D7%95%D7%AA%20%D7%9C%D7%AA%D7%9B%D7%A0%D7%95%D7%9F%20%D7%A8%D7%9E%D7%96%D7%95%D7%A8%D7%99%D7%9D.pdf): signal sequence, timings and intergreen method
