@@ -144,21 +144,26 @@ Average wait per vehicle, 95th-percentile wait (fairness), throughput, average q
 Python 3.11 via `uv` (`pyproject.toml` + `uv.lock`) · SUMO + TraCI/libsumo (our own sim loop, no `sumo-rl`) · PyYAML (`safe_load` only) · Gymnasium · Stable-Baselines3 (DQN, PPO) · PyTorch · TensorBoard/W&B · Ultralytics YOLO · ByteTrack via `supervision` · OpenCV · pytest + `hypothesis` (property-based tests for the safety guard) · Docker · GitHub Actions · Streamlit
 
 ## Repo layout (planned)
+An installable package in the src layout. Imports look like `from smart_traffic_lights.safety import phase_guard`.
 ```
-sim/          SUMO network + seeded route generators (low/med/high/rush-hour/asymmetric)
-controllers/  base.py, fixed_time.py, actuated.py, max_pressure.py, rl_agent.py
-safety/       phase_guard.py
-rl/           env wrapper, state/reward definitions, train.py, configs/
-perception/   detector.py, tracker.py, lane_zones.py, undistort.py
-interface/    JunctionState dataclass
-eval/         benchmark.py, plots, stats
-demo/         side-by-side video renderer, Streamlit app
+src/smart_traffic_lights/
+  sim/          SUMO network + seeded route generators (low/med/high/rush-hour/asymmetric)
+  controllers/  base.py, fixed_time.py, actuated.py, max_pressure.py, rl_agent.py
+  safety/       phase_guard.py
+  rl/           env wrapper, state/reward definitions, train.py, configs/
+  perception/   detector.py, tracker.py, lane_zones.py, undistort.py
+  interface/    JunctionState dataclass
+  eval/         benchmark.py, plots, stats
+  demo/         side-by-side video renderer, Streamlit app
 tests/
-docs/         pinned-questions.md, references/ (official PDFs, local only, not in git)
+docs/           pinned-questions.md, references/ (official PDFs, local only, not in git)
+pyproject.toml  project settings + dependencies   (uv.lock pins exact versions; .python-version = 3.11)
 ```
 
 ## Commands
 _To be filled in as they exist._
+- Setup: `uv sync` (creates `.venv/` from `uv.lock`)
+- Run anything in the project environment: `uv run <command>`
 - Tests: `TBD`
 - Benchmark: `TBD` (target: `python eval/benchmark.py --scenarios all --seeds 10`)
 - Train: `TBD`
@@ -178,8 +183,8 @@ _To be filled in as they exist._
 ## Current status
 - 2026-11-04: M0 done. CLAUDE.md, README, MIT LICENSE and .gitignore are committed and pushed to https://github.com/raztayar/smart-traffic-lights (public, with topics set). No code yet.
 - 2026-11-04: M1 planning done. We settled the junction layout, the terminology, the phase set (confirmed by an exhaustive conflict check), the evaluation split and the tooling. No code yet.
-- 2026-11-05: Reviewed the open questions. Decided: our own sim loop, an intergreen matrix, and the `JunctionState` contents. Read the official Israeli signal guidelines (see **Signal timing**). `uv` is not installed on this machine yet. No code yet.
-- **Next step:** install `uv` and SUMO (explain the install options first), then set up the environment.
+- 2026-11-05: Reviewed the open questions. Decided: our own sim loop, an intergreen matrix, and the `JunctionState` contents. Read the official Israeli signal guidelines (see **Signal timing**). Installed `uv` 0.13.7 via Homebrew. Set up the uv project (`uv init --package`, Python 3.11.18). No code yet.
+- **Next step:** install SUMO (how is not decided yet).
 
 ## Open questions (M1)
 - **Intergreen values.** What uniform value to start with? Later, per-pair values could be calculated with the official formula from our SUMO geometry. Also unclear: does red+yellow fall inside the intergreen time or after it?
@@ -211,5 +216,7 @@ _To be filled in as they exist._
 - 2026-11-05: `JunctionState` = a list of cars + the signal state + time (see Architecture). Raz's reasoning: keeping each car's wait allows more flexible rewards, such as fairness terms. Cars inside the junction are included. Scenario name, seed and time of day stay out of the RL observation.
 - 2026-11-05: The conflict matrix isn't a separate table. It's the set of pairs in the YAML intergreen matrix. A test recomputes conflicts from the lane layout (the edge-walk method from 2026-11-04) and checks they match that set exactly. It also checks that every phase in every phase set is conflict-free.
 - 2026-11-05: The official reference PDFs live in `docs/references/` but stay out of git (size, and redistribution of Ministry documents). CLAUDE.md and the README link to the sources.
+- 2026-11-05: The code is an installable package in the src layout (`src/smart_traffic_lights/`), so tests and scripts import it the same way and our generic module names (`sim`, `eval`, `interface`) can't clash with other libraries.
+- 2026-11-05: uv manages Python 3.11 (pinned in `.python-version`) instead of the Mac's system Python, so CI and Docker get the same version.
 - 2026-11-05: YAML is read with PyYAML `safe_load`, never `load`, which can build arbitrary Python objects.
 - 2026-11-05: Work style: log decisions immediately, not at the end of the session. "Pin" → `docs/pinned-questions.md`.
