@@ -22,9 +22,14 @@ env/
 data/
 datasets/
 
+# --- Reference documents (official PDFs, kept locally; sources are linked in CLAUDE.md) ---
+docs/references/*.pdf
+
 # --- Training outputs ---
-runs/          # TensorBoard logs
-wandb/         # Weights & Biases logs
+# TensorBoard logs
+runs/
+# Weights & Biases logs
+wandb/
 checkpoints/
 models/
 *.pt
