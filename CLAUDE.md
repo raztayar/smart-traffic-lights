@@ -141,7 +141,7 @@ SUMO simulator ─────────────────► JunctionSt
 Average wait per vehicle, 95th-percentile wait (fairness), throughput, average queue length.
 
 ## Tech stack
-Python 3.11 via `uv` (`pyproject.toml` + `uv.lock`) · SUMO + TraCI/libsumo (our own sim loop, no `sumo-rl`) · PyYAML (`safe_load` only) · Gymnasium · Stable-Baselines3 (DQN, PPO) · PyTorch · TensorBoard/W&B · Ultralytics YOLO · ByteTrack via `supervision` · OpenCV · pytest + `hypothesis` (property-based tests for the safety guard) · Docker · GitHub Actions · Streamlit
+Python 3.11 via `uv` (`pyproject.toml` + `uv.lock`) · SUMO 1.28 as pinned Python packages (`eclipse-sumo`, `traci`, `libsumo`) with our own sim loop, no `sumo-rl` · PyYAML (`safe_load` only) · Gymnasium · Stable-Baselines3 (DQN, PPO) · PyTorch · TensorBoard/W&B · Ultralytics YOLO · ByteTrack via `supervision` · OpenCV · pytest + `hypothesis` (property-based tests for the safety guard) · Docker · GitHub Actions · Streamlit
 
 ## Repo layout (planned)
 An installable package in the src layout. Imports look like `from smart_traffic_lights.safety import phase_guard`.
@@ -164,6 +164,7 @@ pyproject.toml  project settings + dependencies   (uv.lock pins exact versions; 
 _To be filled in as they exist._
 - Setup: `uv sync` (creates `.venv/` from `uv.lock`)
 - Run anything in the project environment: `uv run <command>`
+- SUMO comes from `.venv` (`uv run sumo`, `uv run netedit`). No system install, and no need to set `SUMO_HOME`.
 - Tests: `TBD`
 - Benchmark: `TBD` (target: `python eval/benchmark.py --scenarios all --seeds 10`)
 - Train: `TBD`
@@ -183,13 +184,15 @@ _To be filled in as they exist._
 ## Current status
 - 2026-11-04: M0 done. CLAUDE.md, README, MIT LICENSE and .gitignore are committed and pushed to https://github.com/raztayar/smart-traffic-lights (public, with topics set). No code yet.
 - 2026-11-04: M1 planning done. We settled the junction layout, the terminology, the phase set (confirmed by an exhaustive conflict check), the evaluation split and the tooling. No code yet.
-- 2026-11-05: Reviewed the open questions. Decided: our own sim loop, an intergreen matrix, and the `JunctionState` contents. Read the official Israeli signal guidelines (see **Signal timing**). Installed `uv` 0.13.7 via Homebrew. Set up the uv project (`uv init --package`, Python 3.11.18). No code yet.
-- **Next step:** install SUMO (how is not decided yet).
+- 2026-11-05: Reviewed the open questions. Decided: our own sim loop, an intergreen matrix, and the `JunctionState` contents. Read the official Israeli signal guidelines (see **Signal timing**). Installed `uv` 0.13.7 via Homebrew. Set up the uv project (`uv init --package`, Python 3.11.18). Installed SUMO 1.28.0 as pinned packages. Checked that libsumo and traci both run a test network. `sumo-gui` can't open a window yet because it needs XQuartz (X11). No code yet.
+- **Next step (proposed, Raz to confirm):** the first code. Write the junction YAML (lights → movements, phase sets, intergreen matrix) plus its pytest conflict test. Explain the YAML structure, where the file lives, and the test plan before writing anything. This needs the open questions on intergreen value and speed limit answered first.
+- **Pending: XQuartz** for `sumo-gui`: `brew install --cask xquartz` (asks for the Mac password and needs a log out/in). Recommended when we build the SUMO junction network. Not decided yet.
 
 ## Open questions (M1)
 - **Intergreen values.** What uniform value to start with? Later, per-pair values could be calculated with the official formula from our SUMO geometry. Also unclear: does red+yellow fall inside the intergreen time or after it?
 - **Speed limit.** Assume 50 km/h (a typical urban street)? Under the guidelines that means no flashing green, which matches our earlier decision for a better reason.
 - **`JunctionState` details:** the speed below which a car counts as stopped, the observation-zone length, and the virtual detector distance.
+- **Decisions log location.** Suggested: move it to `docs/decisions.md` (an ADR-style log) once CLAUDE.md gets long, and keep a pointer here. Git history is the action log. There's no separate action file.
 
 ## Decisions log
 - 2026-11-04: Target ML/AI-engineer roles, so the RL controller and benchmark are the centerpiece and vision stays pragmatic.
@@ -218,5 +221,6 @@ _To be filled in as they exist._
 - 2026-11-05: The official reference PDFs live in `docs/references/` but stay out of git (size, and redistribution of Ministry documents). CLAUDE.md and the README link to the sources.
 - 2026-11-05: The code is an installable package in the src layout (`src/smart_traffic_lights/`), so tests and scripts import it the same way and our generic module names (`sim`, `eval`, `interface`) can't clash with other libraries.
 - 2026-11-05: uv manages Python 3.11 (pinned in `.python-version`) instead of the Mac's system Python, so CI and Docker get the same version.
+- 2026-11-05: SUMO is installed as Python packages (`eclipse-sumo`, `traci`, `libsumo`, 1.28.0) pinned in `uv.lock`, so every machine, CI and Docker run the same simulator. Not Homebrew or the macOS installer.
 - 2026-11-05: YAML is read with PyYAML `safe_load`, never `load`, which can build arbitrary Python objects.
 - 2026-11-05: Work style: log decisions immediately, not at the end of the session. "Pin" → `docs/pinned-questions.md`.
